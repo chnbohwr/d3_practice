@@ -1,0 +1,17 @@
+{
+  "name": "tut_1",
+  "main": "index.js",
+  "authors": [
+    "Hyman_Chen <hyman_chen@wistron.com>"
+  ],
+  "description": "",
+  "license": "MIT",
+  "homepage": "",
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests"
+  ]
+}
