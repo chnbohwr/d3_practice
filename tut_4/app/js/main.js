@@ -1,31 +1,51 @@
 const width = 960,
   height = 136,
-  cellSize = 17;
+  cellSize = 17,
+  rangeStart = 2015,
+  rangeEnd = 2018;
 
 const color = d3
   .scaleLinear()
   .domain([-1, 0, 1])
   .range(['red', 'white', 'green']);
 
-const svg = d3.select("#app")
-  .selectAll("svg")
-  .data(d3.range(1990, 2011))
-  .enter().append("svg")
-  .attr("width", width)
-  .attr("height", height)
-  .append("g")
-  // .attr('x', 10)
-  // .attr('y', 40)
-  .attr("transform", "translate(" + ((width - cellSize * 53) / 2) + "," + (height - cellSize * 7 - 1) + ")");
+const fakeData = d3.timeDays(new Date(rangeStart, 0, 1), new Date(rangeEnd, 0, 1))
+  .reduce((acc, val) => { acc[val] = Math.random(); return acc; }, {});
 
-svg.append("text")
-  .attr("transform", "translate(-6," + cellSize * 3.5 + ")rotate(-90)")
-  .attr("font-family", "sans-serif")
-  .attr("font-size", 10)
-  .attr("text-anchor", "middle")
-  .text(function (d) { return d; });
+const formatPrice = d3.format('.2%');
 
-window.test = svg
+
+const svg = d3
+  .select('#app')
+  .selectAll('svg')
+  .data(d3.range(2015, 2018))
+  .enter()
+  .append('svg')
+  .attrs({ width, height })
+
+const rectgroup = svg
+  .append('g')
+  .attr("fill", "white")
+  .attr("stroke", "#ccc")
+  .selectAll("rect")
+  .data(d => d3.timeDays(new Date(d, 0, 1), new Date(d + 1, 0, 1)))
+  .enter()
+  .append('rect')
+  .attrs({
+    width: cellSize,
+    height: cellSize,
+    x: d => d3.timeWeek.count(d3.timeYear(d), d) * cellSize,
+    y: d => d.getDay() * cellSize
+  })
+
+rectgroup
+  .append('title')
+  .text(d => `${d.toLocaleDateString()}: ${formatPrice(fakeData[d])}`);
+
+rectgroup.attr('fill', d => color(fakeData[d]))
+
+
+window.test = rectgroup;
 
 
 
