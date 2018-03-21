@@ -32,6 +32,7 @@ const rectgroup = svg
   .enter()
   .append('rect')
   .attrs({
+    'stroke-width': 2,
     width: cellSize,
     height: cellSize,
     x: d => d3.timeWeek.count(d3.timeYear(d), d) * cellSize,
