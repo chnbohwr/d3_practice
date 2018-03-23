@@ -1,52 +1,34 @@
-const width = 960,
-  height = 136,
-  cellSize = 17,
-  rangeStart = 2015,
-  rangeEnd = 2018;
+const width = 600,
+  height = 600,
+  radius = Math.min(width, height) / 2;
 
-const color = d3
-  .scaleLinear()
-  .domain([-1, 0, 1])
-  .range(['red', 'white', 'green']);
+const dataset = [
+  { label: 'Abulia', value: 10 },
+  { label: 'Betelgeuse', value: 20 },
+  { label: 'Cantaloupe', value: 30 },
+  { label: 'Dijkstra', value: 40 }
+];
 
-const fakeData = d3.timeDays(new Date(rangeStart, 0, 1), new Date(rangeEnd, 0, 1))
-  .reduce((acc, val) => { acc[val] = Math.random(); return acc; }, {});
+const color = d3.scaleOrdinal(d3.schemeCategory20);
 
-const formatPrice = d3.format('.2%');
+const svg = d3.select('#app').append('svg')
+  .attrs({ width, height });
 
+const group = svg.append('g').attrs({ transform: `translate(${width / 2},${height / 2})` });
 
-const svg = d3
-  .select('#app')
-  .selectAll('svg')
-  .data(d3.range(2015, 2018))
+const arc = d3.arc().innerRadius(radius / 2).outerRadius(radius);
+
+const pie = d3.pie().value(d => d.value).sort(null);
+
+console.log(pie(dataset));
+console.log(arc(pie(dataset)[0]));
+
+const path = group
+  .selectAll('path')
+  .data(pie(dataset))
   .enter()
-  .append('svg')
-  .attrs({ width, height })
-
-const rectgroup = svg
-  .append('g')
-  .attr("fill", "white")
-  .attr("stroke", "#ccc")
-  .selectAll("rect")
-  .data(d => d3.timeDays(new Date(d, 0, 1), new Date(d + 1, 0, 1)))
-  .enter()
-  .append('rect')
+  .append('path')
   .attrs({
-    'stroke-width': 2,
-    width: cellSize,
-    height: cellSize,
-    x: d => d3.timeWeek.count(d3.timeYear(d), d) * cellSize,
-    y: d => d.getDay() * cellSize
-  })
-
-rectgroup
-  .append('title')
-  .text(d => `${d.toLocaleDateString()}: ${formatPrice(fakeData[d])}`);
-
-rectgroup.attr('fill', d => color(fakeData[d]))
-
-
-window.test = rectgroup;
-
-
-
+    d: arc,
+    fill: (d) => color(d.data.label)
+  });
